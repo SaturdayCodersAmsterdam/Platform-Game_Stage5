@@ -10,10 +10,17 @@ var x = game.width/2;
 var y = game.height/2;
 var dirX = 10;
 var dirY = 10;
+var emitter;
+var path;
+var index;
 
 function preload() {
 
-  game.load.image('mySprite', 'sprite.png');
+  game.load.image('mySprite', 'assets/sprite.png');
+  game.load.image('fire1', 'assets/fire1.png');
+  game.load.image('fire2', 'assets/fire2.png');
+  game.load.image('fire3', 'assets/fire3.png');
+  game.load.image('smoke', 'assets/smoke-puff.png');
 }
 
 
@@ -22,9 +29,17 @@ function create() {
   game.physics.startSystem(Phaser.Physics.ARCADE);
   game.stage.backgroundColor = '#333';
 
-  mySprite = game.add.sprite( x, y, 'mySprite');
+
+    emitter = game.add.emitter(game.world.centerX, game.world.centerY, 400);
+
+    emitter.makeParticles( [ 'fire1', 'fire2', 'fire3', 'smoke' ] );
+
+    emitter.gravity = 200;
+    emitter.setAlpha(1, 0, 3000);
+
     //  scale sprites like this:
 
+    mySprite = game.add.sprite( x, y, 'mySprite');
     mySprite.scale.x = 0.1;
     mySprite.scale.y = 0.1;
     mySprite.anchor.setTo(0.5, 0.5);
@@ -37,14 +52,49 @@ function create() {
     mySprite.inputEnabled = true;
 
     cursors = game.input.keyboard.createCursorKeys();
+   
+
+}
+
+function particleBurst() {
+    var px = mySprite.body.velocity.x;
+    var py = mySprite.body.velocity.y;
+
+    px *= -1;
+    py *= -1;
+
+    emitter.minParticleSpeed.set(px, py);
+    emitter.maxParticleSpeed.set(px, py);
+
+    emitter.emitX = mySprite.x;
+    emitter.emitY = mySprite.y;
+
+    // Phaser.Particles.Arcade.Emitter.setScale(minX, maxX, minY, maxY, rate, ease, yoyo) : void;
+    emitter.setScale(0.1, 1, 0.1, 1, 6000);
+
+    //emitter.x = pointer.x;
+    //emitter.y = pointer.y;
+
+    emitter.start(true, 500, null, 5);
+
+    //  And 2 seconds later we'll destroy the emitter
+    game.time.events.add(500, destroyEmitter);
+
+}
+
+function destroyEmitter() {
+
+if (emitter !== null){
+   //   emitter.destroy();
+  }
 }
 
 function update () {
 
-
     if ( x > game.width - mySprite.width || x < 0 ) {
       dirX = -dirX;
     }
+
     if ( y > game.height - mySprite.height || y < 0 ) {
       dirY = -dirY;
     }
@@ -52,12 +102,16 @@ function update () {
 
     if (cursors.down.isDown) {
       mySprite.y = mySprite.y + 10;
+
     }
     if (cursors.up.isDown)
     {
+       // fire = true;
         mySprite.y = mySprite.y - 10;
-
+         particleBurst();
+      //  emitter.start(false, 3000, 5);
     }
+
     else
     {
     }
@@ -65,10 +119,12 @@ function update () {
     if (cursors.left.isDown)
     {
         mySprite.x = mySprite.x - 10;
+              particleBurst();
     }
     else if (cursors.right.isDown)
     {
         mySprite.x = mySprite.x + 10 ;
+              particleBurst();
     }
     else
     {
@@ -79,6 +135,10 @@ function update () {
     {
         fireBullet();
     }
+
+
+
+
 
 
 }
