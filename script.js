@@ -13,14 +13,19 @@ var dirY = 10;
 var emitter;
 var path;
 var index;
+var weapon;
+var fireButton;
+var student;
 
 function preload() {
-
   game.load.image('mySprite', 'assets/sprite.png');
   game.load.image('fire1', 'assets/fire1.png');
   game.load.image('fire2', 'assets/fire2.png');
   game.load.image('fire3', 'assets/fire3.png');
   game.load.image('smoke', 'assets/smoke-puff.png');
+  game.load.image('pixel', 'assets/trans-pixel.png');
+  game.load.image('bullet', 'assets/bullet.png');
+  game.load.spritesheet('student', 'assets/student.png', 64, 64);
 }
 
 
@@ -28,7 +33,6 @@ function create() {
 
   game.physics.startSystem(Phaser.Physics.ARCADE);
   game.stage.backgroundColor = '#333';
-
 
     emitter = game.add.emitter(game.world.centerX, game.world.centerY, 400);
 
@@ -52,8 +56,63 @@ function create() {
     mySprite.inputEnabled = true;
 
     cursors = game.input.keyboard.createCursorKeys();
-   
 
+    this.student = game.add.sprite( x, y, 'student');
+
+    // flag to determine if the hero is supposed to move right
+          this.student.goingRight = false;
+          // flag to determine if the hero is supposed to move left
+          this.student.goingLeft = false;
+          // default idle frame, with the hero facing right
+          this.student.idleFrame = 0;
+          // this is how we set an animation, we give it a name and an array with the frames.
+          var walkLeftAnimation = this.student.animations.add('walkLeft', [10, 11, 12, 13, 14, 15, 16, 17, 18]);
+          var walkRightAnimation = this.student.animations.add('walkRight', [28, 29, 30, 31, 32, 33, 34, 35, 36]);
+          var walkUpAnimation = this.student.animations.add('walkUp', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+          var walkDownAnimation = this.student.animations.add('walkDown', [19, 20, 21, 22, 23, 24, 25, 26, 27]);
+          // these are just listeners for X and Z keys
+          this.rightKeyPressed = game.input.keyboard.addKey(Phaser.Keyboard.X);
+          this.leftKeyPressed = game.input.keyboard.addKey(Phaser.Keyboard.Z);          
+          // setting goingRight to true if X is pressed
+          this.rightKeyPressed.onDown.add(function(){
+               this.student.goingRight = true;     
+          }, this);
+          // setting goingRight to false if X is released
+          this.rightKeyPressed.onUp.add(function(){
+               this.student.goingRight = false;     
+          }, this);  
+          // setting goingLeft to true if Y is pressed
+          this.leftKeyPressed.onDown.add(function(){
+               this.student.goingLeft = true;     
+          }, this);
+          // setting goingLeft to false if Y is released
+          this.leftKeyPressed.onUp.add(function(){
+               this.student.goingLeft = false;     
+          }, this);
+
+
+    pixel = game.add.sprite( x, y, 'pixel');   
+
+    //  Creates 30 bullets, using the 'bullet' graphic
+    weapon = game.add.weapon(30, 'bullet');
+
+    //  The bullet will be automatically killed when it leaves the world bounds
+    weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+
+    //  The speed at which the bullet is fired
+    weapon.bulletSpeed = 600;
+
+    //  Speed-up the rate of fire, allowing them to shoot 1 bullet every 60ms
+    weapon.fireRate = 100;
+
+    //  Tell the Weapon to track the 'mySprite' Sprite
+    //  With no offsets from the position
+    //  But the 'true' argument tells the weapon to track sprite rotation
+    weapon.trackSprite(mySprite, 0, 0, true);
+
+    cursors = this.input.keyboard.createCursorKeys();
+
+    fireButton = this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
 }
 
 function particleBurst() {
@@ -84,9 +143,9 @@ function particleBurst() {
 
 function destroyEmitter() {
 
-if (emitter !== null){
-   //   emitter.destroy();
-  }
+  if (emitter !== null){
+     //   emitter.destroy();
+    }
 }
 
 function update () {
@@ -131,14 +190,30 @@ function update () {
       
     }
 
-    if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
-    {
-        fireBullet();
-    }
+    if (fireButton.isDown)
+      {
+          weapon.fire();
+      }
 
 
-
-
+        // if we are going left and not right (we don't want two keys to be pressed at the same time)
+          if(this.student.goingRight && !this.student.goingLeft){
+               this.student.animations.play("walkRight", 10, true); // <- Look!! This is how I play "walkRight" animation at 10fps with looping
+               // idle frame with hero facing right
+               this.student.idleFrame = 0;     
+          }
+          else{
+               // if we are going right and not left
+               if(!this.student.goingRight && this.student.goingLeft){
+                    this.student.animations.play("walkLeft", 10, true); // <- Look!! This is how I play "walkLeft" animation at 10fps with looping 
+                    // idle frame with hero facing left
+                    this.student.idleFrame = 4;      
+               }
+               else{
+                    // show idle frame
+                    this.student.frame = this.student.idleFrame;         
+               }
+          }
 
 
 }
