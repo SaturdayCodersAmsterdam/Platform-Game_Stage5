@@ -24,28 +24,17 @@ var fireButton;
 var student;
 
 function preload() {
-  game.load.image('mySprite', 'assets/sprite.png');
-  game.load.image('fire1', 'assets/fire1.png');
-  game.load.image('fire2', 'assets/fire2.png');
-  game.load.image('fire3', 'assets/fire3.png');
-  game.load.image('smoke', 'assets/smoke-puff.png');
-  game.load.image('pixel', 'assets/trans-pixel.png');
-  game.load.image('bullet', 'assets/bullet.png');
-  game.load.spritesheet('student', 'assets/student.png', 64, 64);
-
     game.load.image('mySprite', 'assets/sprite.png');
     game.load.image('fire1', 'assets/fire1.png');
     game.load.image('fire2', 'assets/fire2.png');
     game.load.image('fire3', 'assets/fire3.png');
     game.load.image('smoke', 'assets/smoke-puff.png');
-
-    game.load.atlasJSONHash('enemy', 'assets/bot.png', 'assets/bot.json');
-
+    game.load.image('pixel', 'assets/trans-pixel.png');
+    game.load.image('bullet', 'assets/bullet.png');
     game.load.image('box', 'assets/box.png');
     game.load.image('lift', 'assets/lift.png');
-
-
-
+    game.load.atlasJSONHash('student', 'assets/student.png','assets/student.json');
+    game.load.atlasJSONHash('enemy', 'assets/bot.png', 'assets/bot.json');
 }
 
 
@@ -63,7 +52,13 @@ function create() {
 
     //  scale sprites like this:
 
-    mySprite = game.add.sprite( x, y, 'mySprite');
+    mySprite = game.add.sprite( x, y, 'student');
+    mySprite.animations.add('left', ['left1', 'left2']);
+    mySprite.animations.add('right', ['right1', 'right2']);
+    mySprite.animations.add('up'), ['up1', 'up2'];
+    mySprite.animations.add('down', ['down1', 'down2']);
+
+
     enemy = game.add.sprite( enemyX, enemyY, 'enemy');
     box = game.add.sprite( boxX, boxY, 'box');
     lift = game.add.sprite( liftX, liftY, 'lift');
@@ -75,8 +70,8 @@ function create() {
     enemy.body.gravity.set(0, 180);
     enemy.body.collideWorldBounds = true;
 
-    mySprite.scale.x = 0.1;
-    mySprite.scale.y = 0.1;
+    mySprite.scale.x = 0.99;
+    mySprite.scale.y = 0.99;
     mySprite.anchor.setTo(0.5, 0.5);
     game.physics.arcade.enable(mySprite);
     mySprite.body.velocity.setTo(200, 200);
@@ -113,24 +108,30 @@ function update () {
         mySprite.y = mySprite.y - 10;
          particleBurst();
       //  emitter.start(false, 3000, 5);
+        mySprite.animations.play('up', 30, false);
     }
     else
     {
+        mySprite.animations.play('stop', 30, false);
     }
 
     if (cursors.left.isDown)
     {
         mySprite.x = mySprite.x - 10;
               particleBurst();
+
+        mySprite.animations.play('left', 30, false);
+
     }
     else if (cursors.right.isDown)
     {
         mySprite.x = mySprite.x + 10 ;
               particleBurst();
+        mySprite.animations.play('right', 30, false);
     }
     else
     {
-      
+        mySprite.animations.play('stop', 30, false);
     }
 
     if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
@@ -138,17 +139,7 @@ function update () {
         fireBullet();
     }
 
-
-
-
-
-
 }
-
-
-
-
-
 
 function particleBurst() {
     var px = mySprite.body.velocity.x;
@@ -183,15 +174,11 @@ function destroyEmitter() {
     }
 }
 
-
-
 function yahoo(){
 
     console.log('yahoo');
 
 }
-
-
 
 function onDown(dog) {
   console.log('clicked');
