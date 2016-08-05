@@ -1,7 +1,5 @@
 var cursors;
 var game = new Phaser.Game(640,480, Phaser.AUTO, 'world', {
-
-
   preload: preload, create: create, update: update });
 
 var enemyX = 200;
@@ -21,8 +19,19 @@ var dirY = 10;
 var emitter;
 var path;
 var index;
+var weapon;
+var fireButton;
+var student;
 
 function preload() {
+  game.load.image('mySprite', 'assets/sprite.png');
+  game.load.image('fire1', 'assets/fire1.png');
+  game.load.image('fire2', 'assets/fire2.png');
+  game.load.image('fire3', 'assets/fire3.png');
+  game.load.image('smoke', 'assets/smoke-puff.png');
+  game.load.image('pixel', 'assets/trans-pixel.png');
+  game.load.image('bullet', 'assets/bullet.png');
+  game.load.spritesheet('student', 'assets/student.png', 64, 64);
 
     game.load.image('mySprite', 'assets/sprite.png');
     game.load.image('fire1', 'assets/fire1.png');
@@ -44,7 +53,6 @@ function create() {
 
   game.physics.startSystem(Phaser.Physics.ARCADE);
   game.stage.backgroundColor = '#333';
-
 
     emitter = game.add.emitter(game.world.centerX, game.world.centerY, 400);
 
@@ -83,10 +91,7 @@ function create() {
     game.physics.arcade.enable(lift);
 
     cursors = game.input.keyboard.createCursorKeys();
-   
-
 }
-
 
 function update () {
 
@@ -95,7 +100,6 @@ function update () {
     if ( x > game.width - mySprite.width || x < 0 ) {
       dirX = -dirX;
     }
-
     if ( y > game.height - mySprite.height || y < 0 ) {
       dirY = -dirY;
     }
@@ -103,16 +107,13 @@ function update () {
 
     if (cursors.down.isDown) {
       mySprite.y = mySprite.y + 10;
-
     }
     if (cursors.up.isDown)
     {
-       // fire = true;
         mySprite.y = mySprite.y - 10;
          particleBurst();
       //  emitter.start(false, 3000, 5);
     }
-
     else
     {
     }
