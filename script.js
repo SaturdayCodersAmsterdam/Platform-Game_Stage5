@@ -2,15 +2,15 @@ var cursors;
 var game = new Phaser.Game(640,480, Phaser.AUTO, 'world', {
   preload: preload, create: create, update: update });
 
-var enemyX = 200;
-var enemyY= 100;
+var mexicanX = 200;
+var mexicanY= 100;
 var boxX = 200;
 var boxY = 250;
 var liftX = 400;
 var liftY = 250;
-
+var lift ;
 var mySprite;
-var enemy;
+var mexican;
 
 var x = game.width/2;
 var y = game.height/2;
@@ -33,8 +33,9 @@ function preload() {
     game.load.image('bullet', 'assets/bullet.png');
     game.load.image('box', 'assets/box.png');
     game.load.image('lift', 'assets/lift.png');
+    game.load.image('background', 'assets/header.jpg');
     game.load.atlasJSONHash('student', 'assets/student.png','assets/student.json');
-    game.load.atlasJSONHash('enemy', 'assets/bot.png', 'assets/bot.json');
+    game.load.atlasJSONHash('mexican', 'assets/mexican.png', 'assets/mexican.json');
 }
 
 
@@ -42,36 +43,38 @@ function create() {
 
   game.physics.startSystem(Phaser.Physics.ARCADE);
   game.stage.backgroundColor = '#333';
-
+  game.add.tileSprite(-400,-400, 2000, 1600, 'background');
     emitter = game.add.emitter(game.world.centerX, game.world.centerY, 400);
 
     emitter.makeParticles( [ 'fire1', 'fire2', 'fire3', 'smoke' ] );
 
-    emitter.gravity = 200;
+    emitter.gravity = 800;
     emitter.setAlpha(1, 0, 3000);
 
     //  scale sprites like this:
 
-    mySprite = game.add.sprite( x, y, 'student');
-    mySprite.animations.add('left', ['left1', 'left2']);
-    mySprite.animations.add('right', ['right1', 'right2']);
-    mySprite.animations.add('up'), ['up1', 'up2'];
+    mySprite = game.add.sprite( 600,480, 'student');
+    mySprite.animations.add('left', ['left1', 'left2','left3', 'left4','left5', 'left6','left7', 'left8','left9']);
+    mySprite.animations.add('right', ['right1', 'right2','right3', 'right4','right5', 'right6','right7', 'right8', 'right9']);
+    mySprite.animations.add('up'), ['up1', 'up2','up3', 'up4','up5', 'up6','up7', 'up8','up9'];
     mySprite.animations.add('down', ['down1', 'down2']);
 
 
-    enemy = game.add.sprite( enemyX, enemyY, 'enemy');
+    mexican = game.add.sprite( mexicanX, mexicanY, 'mexican');
     box = game.add.sprite( boxX, boxY, 'box');
     lift = game.add.sprite( liftX, liftY, 'lift');
 
-    enemy.animations.add('stop');
-    enemy.animations.play('stop', 5, true);
-
-    game.physics.arcade.enable(enemy);
-    enemy.body.gravity.set(0, 180);
-    enemy.body.collideWorldBounds = true;
-
-    mySprite.scale.x = 0.99;
-    mySprite.scale.y = 0.99;
+    mexican.animations.add('stop');
+    mexican.animations.play('stop', 5, true);
+    game.physics.arcade.enable(mexican);
+    game.physics.arcade.enable(box);
+    game.physics.arcade.enable(lift);
+    mexican.body.gravity.set(0, 180);
+    mexican.body.collideWorldBounds = true;
+    lift.body.collideWorldBounds = true;
+    box.body.collideWorldBounds = true;
+    //mySprite.scale.x = 0.99;
+    //mySprite.scale.y = 0.99;
     mySprite.anchor.setTo(0.5, 0.5);
     game.physics.arcade.enable(mySprite);
     mySprite.body.velocity.setTo(200, 200);
@@ -79,18 +82,38 @@ function create() {
     mySprite.body.collideWorldBounds = true;
     // mySprite.bounce.set(0.8);
     mySprite.body.gravity.set(0, 180);
-    mySprite.inputEnabled = true;
+    //mySprite.inputEnabled = true;
 
     game.physics.arcade.enable(box);
 
     game.physics.arcade.enable(lift);
 
     cursors = game.input.keyboard.createCursorKeys();
+
+    //  Creates 30 bullets, using the 'bullet' graphic
+    weapon = game.add.weapon(30, 'bullet');
+
+    //  The bullet will be automatically killed when it leaves the world bounds
+    weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+
+    //  The speed at which the bullet is fired
+    weapon.bulletSpeed = 600;
+
+    //  Speed-up the rate of fire, allowing them to shoot 1 bullet every 60ms
+    weapon.fireRate = 100;
+
+    //  Tell the Weapon to track the 'mySprite' Sprite
+    //  With no offsets from the position
+    //  But the 'true' argument tells the weapon to track sprite rotation
+    weapon.trackSprite(mySprite, 0, 0, true);
+
 }
 
 function update () {
 
-    game.physics.arcade.collide(enemy, box, yahoo);
+    game.physics.arcade.collide(mexican, box, yahoo);
+    game.physics.arcade.collide(mySprite, box, yahoo);
+    game.physics.arcade.collide(mySprite, lift, yahoo);
 
     if ( x > game.width - mySprite.width || x < 0 ) {
       dirX = -dirX;
@@ -101,7 +124,7 @@ function update () {
 
 
     if (cursors.down.isDown) {
-      mySprite.y = mySprite.y + 10;
+      mySprite.y = mySprite.y + 1;
     }
     if (cursors.up.isDown)
     {
@@ -117,28 +140,31 @@ function update () {
 
     if (cursors.left.isDown)
     {
-        mySprite.x = mySprite.x - 10;
-              particleBurst();
-
-        mySprite.animations.play('left', 30, false);
+        if (cursors.up.isDown) {
+            mySprite.x = mySprite.x - 10;
+        }else{
+            mySprite.x = mySprite.x - 5;
+        }
+        mySprite.animations.play('left', 15, false);
 
     }
     else if (cursors.right.isDown)
     {
-        mySprite.x = mySprite.x + 10 ;
-              particleBurst();
-        mySprite.animations.play('right', 30, false);
-    }
-    else
+        if (cursors.up.isDown) {
+            mySprite.x = mySprite.x + 10;
+        }else{
+            mySprite.x = mySprite.x + 5;
+        }
+        mySprite.animations.play('right', 15, false);
+    } else
     {
-        mySprite.animations.play('stop', 30, false);
+        mySprite.animations.play('stop', 15, false);
     }
 
     if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
     {
-        fireBullet();
+        weapon.fire();
     }
-
 }
 
 function particleBurst() {
@@ -155,10 +181,7 @@ function particleBurst() {
     emitter.emitY = mySprite.y;
 
     // Phaser.Particles.Arcade.Emitter.setScale(minX, maxX, minY, maxY, rate, ease, yoyo) : void;
-    emitter.setScale(0.1, 1, 0.1, 1, 6000);
-
-    //emitter.x = pointer.x;
-    //emitter.y = pointer.y;
+    emitter.setScale(0.01, .5, 0.01, .1, 600);
 
     emitter.start(true, 500, null, 5);
 
