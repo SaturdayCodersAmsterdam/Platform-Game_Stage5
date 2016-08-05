@@ -51,8 +51,6 @@ function create() {
     emitter.gravity = 800;
     emitter.setAlpha(1, 0, 3000);
 
-    //  scale sprites like this:
-
     mySprite = game.add.sprite( 600,480, 'student');
     mySprite.animations.add('left', ['left1', 'left2','left3', 'left4','left5', 'left6','left7', 'left8','left9']);
     mySprite.animations.add('right', ['right1', 'right2','right3', 'right4','right5', 'right6','right7', 'right8', 'right9']);
