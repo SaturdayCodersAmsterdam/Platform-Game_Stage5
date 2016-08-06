@@ -57,7 +57,6 @@ function create() {
     mySprite.animations.add('up'), ['up1', 'up2','up3', 'up4','up5', 'up6','up7', 'up8','up9'];
     mySprite.animations.add('down', ['down1', 'down2']);
 
-
     mexican = game.add.sprite( mexicanX, mexicanY, 'mexican');
     box = game.add.sprite( boxX, boxY, 'box');
     lift = game.add.sprite( liftX, liftY, 'lift');
@@ -99,7 +98,7 @@ function create() {
 
     //  Speed-up the rate of fire, allowing them to shoot 1 bullet every 60ms
     weapon.fireRate = 100;
-
+[]
     //  Tell the Weapon to track the 'mySprite' Sprite
     //  With no offsets from the position
     //  But the 'true' argument tells the weapon to track sprite rotation
@@ -179,7 +178,7 @@ function particleBurst() {
     emitter.emitY = mySprite.y;
 
     // Phaser.Particles.Arcade.Emitter.setScale(minX, maxX, minY, maxY, rate, ease, yoyo) : void;
-    emitter.setScale(0.01, .5, 0.01, .1, 600);
+    emitter.setScale(0.1, 1, 0.1, .1, 6000);
 
     emitter.start(true, 500, null, 5);
 
